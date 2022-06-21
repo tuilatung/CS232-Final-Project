@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SVD</title>
+        <link href="https://fonts.googleapis.com/css?family=Quicksand" rel="stylesheet" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+            integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        />
+        <link href="{{ url_for('static', filename='stylesheet/main.css') }}" rel="stylesheet" />
+        <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="sweetalert2.all.min.js"></script>
+    </head>
+    <body>
+        <div class="app" id="uploadIMG">
+            <div class="main">
+                <div class="container">
+                    <form class="get_img">
+                        <h3>Upload your image :</h3>
+                        <div class="drag-area">
+                            <div class="icon">
+                                <i class="far fa-image"></i>
+                            </div>
+                            <span class="header">Drag & Drop</span>
+                            <span class="header">or <span class="button">Click here to browse</span></span>
+                            <input type="file" name="file" hidden />
+                            <span class="support">Supports: JPEG, JPG, PNG</span>
+                            <!-- <span class="note">Image of your ID card should be visible at 4 corners and make sure it is front side </span> -->
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="app" id="showIMG">
+            <div class="box">
+                <div class="img__box"></div>
+                <div class="info__box">
+                    <p>IMAGE SIZE:
+                        <span id="img__size">A x B</span>
+                    </p> 
+                    <p>#PIXELS = 
+                        <span id="num__pixel">?</span>
+                    </p>
+                    <p>COMPRESSED SIZE ~
+                        <span id="compressed__size"> ?</span>
+                    </p>
+                    <p>COMPESSION RATIO =
+                        <span id="compression__ratio"> = ?/?</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="range">
+            <div class="sliderValue">
+                <span id="number"></span>
+            </div>
+            <div class="field">
+                <div class="value left">0</div>
+                <input type="range" min="1" max="300" value="1" steps="10" id="slider" />
+                <div class="value right">300</div>
+            </div>
+        </div>
+        <script src="{{ url_for('static', filename='scripts/script.js') }}"></script>
+    </body>
+</html>
