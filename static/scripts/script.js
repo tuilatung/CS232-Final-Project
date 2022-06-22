@@ -6,7 +6,7 @@ const uploadImg =  document.querySelector("#uploadIMG");
 const imgArea =  document.querySelector(".img__box");
 const slideValue = document.querySelector("#number");
 const inputSlider = document.querySelector("#slider");
-
+const radioArea = document.querySelector('.wrapper_radio');
 
 let button = document.querySelector('.button');
 let input = dropArea.querySelector('input');
@@ -15,16 +15,38 @@ let imgForm = document.querySelector(".get_img");
 var w;
 var h;
 var base64_image;
+var selectedRadio; 
 
 button.onclick = () => {
   input.click();
 };
 
+
+function checkRadio(){
+  const svd_mode = document.querySelector('#option-1').checked;
+  const jpeg_mode = document.querySelector('#option-2').checked;
+  if (svd_mode == true && jpeg_mode ==false){
+    selectedRadio = 'svd';
+    document.querySelector('.value.right').textContent = 300;
+    inputSlider.max = 300;
+  }
+  else if (svd_mode == false && jpeg_mode ==true){
+    selectedRadio = 'jpeg';
+    document.querySelector('.value.right').textContent = 100;
+    inputSlider.max = 100;
+    inputSlider.value = 50;
+  }
+}
+
 inputSlider.addEventListener('change', function(){
-  // window.alert('changed');
-  // console.log('On Sliderbar changes...');
-  // const URL = '/getslider'
-  const URL = '/svd'
+  var URL;
+  if (selectedRadio == 'svd'){
+    URL = '/svd_compressor';
+  }
+  else{
+    URL = '/jpeg_compressor';
+  }
+  // const URL = '/svd_compressor';
   const xhr = new XMLHttpRequest();
   sender = inputSlider.value
   xhr.open('POST', URL, true);
@@ -43,11 +65,11 @@ inputSlider.addEventListener('change', function(){
   }
 })
 
-function sendIMG(file){
-  const URL = '/upload';
+function sendIMG(file, URL, method){
   const xhr = new XMLHttpRequest();
   const formData = new FormData();
   formData.append('file', file);
+  formData.append('method',method);
   xhr.open('POST', URL);
   xhr.send(formData);
 }
@@ -56,8 +78,27 @@ function sendIMG(file){
 input.addEventListener('change', function () {
   file = this.files[0];
   dropArea.classList.add('active');
-  displayFile();
-  sendIMG(file);
+  const svd_mode = document.querySelector('#option-1').checked;
+  const jpeg_mode = document.querySelector('#option-2').checked;
+  if (svd_mode == false && jpeg_mode == false){
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'Please select type of compressor first',
+  })
+  file = null;
+  dropArea.classList.remove('active');
+}
+  else{
+    displayFile();
+    if (svd_mode == true && jpeg_mode == false){
+      document.querySelector('#option-2').disabled = true;
+    }
+    else if (svd_mode == false && jpeg_mode == true){
+      document.querySelector('#option-1').disabled = true;
+    }
+    sendIMG(file, '/upload', selectedRadio);
+}
 });
 
 // when file is inside drag area
@@ -79,12 +120,30 @@ dropArea.addEventListener('dragleave', () => {
 dropArea.addEventListener('drop', (event) => {
   event.preventDefault();
   file = event.dataTransfer.files[0]; // grab single file even of user selects multiple files
-  displayFile();
-  uploadImg.style.display = "none"
-  showRes.style.display = "block";
-  showImg.style.display = "block";
-  sendIMG(file);
-  // containerRes.style.height = h + 500;
+  const svd_mode = document.querySelector('#option-1').checked;
+  const jpeg_mode = document.querySelector('#option-2').checked;
+  if (svd_mode == false && jpeg_mode == false){
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'Please select type of compressor first',
+  })
+  file = null;
+  dropArea.classList.remove('active');
+  }
+  else{
+    displayFile();
+    uploadImg.style.display = "none";
+    showRes.style.display = "block";
+    showImg.style.display = "block";
+    if (svd_mode == true && jpeg_mode == false){
+      document.querySelector('#option-2').disabled = true;
+    }
+    else if (svd_mode == false && jpeg_mode == true){
+      document.querySelector('#option-1').disabled = true;
+    }
+    sendIMG(file, '/upload', selectedRadio);
+  }
 });
 
 imgForm.addEventListener("change", function(e) {
@@ -93,14 +152,6 @@ imgForm.addEventListener("change", function(e) {
   uploadImg.style.display = "none"
   showRes.style.display = "block";
   showImg.style.display = "block";
-
-  // const formData = new FormData();
-  // if (file != null){
-  //   formData.append('file', file);
-  // }
-  // const URL = '/uploader';
-  // xhr.open('POST', URL, true);
-  // xhr.send(formData);
 });
 
 function displayFile() {
@@ -145,23 +196,15 @@ function displayFile() {
 inputSlider.oninput = (()=>{
   let value = inputSlider.value;
   slideValue.textContent = value;
-  slideValue.style.left = (value/3) + "%";
+  if (document.querySelector('#option-1').checked == true){
+    slideValue.style.left = (value/3) + "%";
+  }
+  else{
+    slideValue.style.left = value + "%";
+  }
   slideValue.classList.add("show");
 });
 
 inputSlider.onblur = (()=>{
   slideValue.classList.remove("show");
 });
-
-// const xhr = new XMLHttpRequest();
-// xhr.onreadystatechange = function(e) {
-//   e.preventDefault();
-//   window.alert(2);
-//   console.log(3);
-//   if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
-//     const update =  new Date();
-//     const data = JSON.parse(xhr.responseText).data;
-//     // document.querySelector('.img__box').textContent = '';
-//     document.querySelector('.img__box').textContent = `<img src="${data}?v=${update.getTime()}" />`; // To update avoid using image from cache
-//   }
-// }
